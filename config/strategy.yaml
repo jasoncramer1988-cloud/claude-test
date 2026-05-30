@@ -1,0 +1,47 @@
+# Strategy + risk configuration for the paper-trading simulation.
+# This is the "editable text" strategy prompt from the architecture diagram.
+# Reads are real-shaped; writes are SIMULATED fills (paper mode).
+
+account:
+  starting_balance: 5000.0   # USDT in the dedicated sub-account
+  base_currency: USDT
+
+# Pairs the bot is allowed to touch. Anything not listed is ignored.
+allowed_pairs:
+  - BTCUSDT
+  - ETHUSDT
+  - SOLUSDT
+
+# How often (in cycles) each task runs. One cycle == one market tick.
+schedule:
+  entry_scan_every: 15       # "*/15 min  ->  entry scan"
+  position_check_every: 1    # "*/1 min   ->  position check"
+
+# Momentum entry rules. Signal = fast EMA vs slow EMA on recent klines.
+strategy:
+  fast_ema: 8
+  slow_ema: 21
+  # Minimum separation between EMAs (as a fraction of price) to act.
+  signal_threshold: 0.0015
+  # Risk-per-trade as a fraction of NAV used to size positions.
+  risk_per_trade: 0.02
+  default_leverage: 3
+  # Stop-loss / take-profit distance from entry (fraction of entry price).
+  stop_loss_pct: 0.02
+  take_profit_pct: 0.04
+  # Force-exit a position after this many cycles if neither TP nor SL hit.
+  max_holding_cycles: 120
+
+# Risk gate -- every write tool passes through these BEFORE the exchange.
+# These are non-negotiable; the strategy cannot override them.
+risk_gate:
+  kill_switch_file: /tmp/HALT_TRADING   # if this file exists -> reject ALL writes
+  daily_loss_cap_pct: 0.05              # -5% of day-start NAV -> halt new entries
+  notional_cap_pct: 0.30               # single order > 30% of NAV -> reject
+  price_sanity_pct: 0.08               # limit price > +/-8% of mark -> reject
+  max_concurrent_positions: 3          # the 4th concurrent position -> reject
+  leverage_caps:                       # per-symbol max leverage
+    BTCUSDT: 10
+    ETHUSDT: 5
+    SOLUSDT: 5
+    default: 3

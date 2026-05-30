@@ -1,0 +1,5 @@
+# Core simulation has ONE dependency; everything else is the Python stdlib.
+PyYAML>=6.0
+
+# Test runner (optional -- tests are written for pytest but use plain asserts).
+pytest>=7.0
