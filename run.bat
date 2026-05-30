@@ -41,6 +41,12 @@ echo  Done. Opening the chart now. Logs are in the  runs\latest  folder.
 echo ============================================================
 if exist runs\latest\equity_curve.png start "" runs\latest\equity_curve.png
 
+echo.
+echo  Want a backtest on REAL Bitcoin prices with 10,000 USD? Running it now...
+%PY% run_real_btc.py --capital 10000 --days 90
+%PY% plot_equity.py runs\real_btc
+if exist runs\real_btc\equity_curve.png start "" runs\real_btc\equity_curve.png
+
 :end
 echo.
 echo  Press any key to close this window...

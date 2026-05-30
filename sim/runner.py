@@ -59,10 +59,12 @@ def load_config(path: str) -> dict:
 
 
 class Simulation:
-    def __init__(self, config: dict, seed: int = 42, out_dir: str = "runs/latest"):
+    def __init__(self, config: dict, seed: int = 42, out_dir: str = "runs/latest",
+                 market=None):
         self.config = config
         symbols = config["allowed_pairs"]
-        self.market = MarketData(symbols, seed=seed)
+        # Inject a real-market replay feed, or default to the synthetic one.
+        self.market = market if market is not None else MarketData(symbols, seed=seed)
         self.exchange = PaperExchange(self.market, config["account"]["starting_balance"])
         self.risk_gate = RiskGate(config)
         self.state = StateStore(out_dir)
