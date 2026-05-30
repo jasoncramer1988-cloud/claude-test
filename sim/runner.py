@@ -7,11 +7,15 @@ One cycle == one market tick, standing in for the diagram's cron cadence:
 
 from __future__ import annotations
 
+import json
 import os
 from dataclasses import dataclass
 from typing import Optional
 
-import yaml
+try:
+    import yaml  # optional: only needed to read the .yaml config
+except ImportError:  # pragma: no cover
+    yaml = None
 
 from .exchange import PaperExchange
 from .market_data import MarketData
@@ -36,8 +40,22 @@ class SimReport:
 
 
 def load_config(path: str) -> dict:
-    with open(path) as fh:
-        return yaml.safe_load(fh)
+    """Load the strategy/risk config.
+
+    Prefers the YAML file if PyYAML is installed; otherwise transparently falls
+    back to the bundled JSON copy (config/strategy.json) so the simulation runs
+    with zero third-party dependencies -- nothing to pip install.
+    """
+    if path.endswith((".yaml", ".yml")) and yaml is not None:
+        with open(path) as fh:
+            return yaml.safe_load(fh)
+
+    # Fall back to the JSON sibling (same content, no dependency needed).
+    json_path = path
+    if path.endswith((".yaml", ".yml")):
+        json_path = os.path.splitext(path)[0] + ".json"
+    with open(json_path) as fh:
+        return json.load(fh)
 
 
 class Simulation:

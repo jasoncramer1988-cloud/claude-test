@@ -17,17 +17,30 @@ is the whole point the diagram makes ("same code can run paper mode").
 > transparent placeholder — not a profitable strategy. If you ever wire the
 > exchange backend to real funds, that is entirely your responsibility.
 
-## Quick start
+## Easiest way (Windows): just double-click
+
+1. Make sure **Python 3** is installed (https://www.python.org/downloads/ — tick
+   *"Add Python to PATH"* during install).
+2. **Double-click `run.bat`.**
+
+A window opens, runs a 1000-cycle backtest, prints the report, and pops open a
+chart of the simulated account value. The window stays open until you press a
+key. No terminal, no commands, and **nothing to pip install** — the config has a
+JSON fallback so PyYAML is optional.
+
+## Running from a terminal (any OS)
 
 ```bash
-pip install -r requirements.txt        # only PyYAML is required to run
-
 python3 run_sim.py                      # 500 cycles, default config
 python3 run_sim.py --cycles 2000 --seed 7
 python3 run_sim.py --halt               # demonstrate the kill switch (0 trades)
+python3 plot_equity.py runs/latest      # render runs/latest/equity_curve.png
 
 python3 -m pytest tests/ -q             # 15 unit tests for the gate + exchange
 ```
+
+PyYAML is optional (`pip install pyyaml` if you want to edit the `.yaml`
+config); without it the simulator reads the bundled `config/strategy.json`.
 
 Output lands in `runs/latest/`:
 
